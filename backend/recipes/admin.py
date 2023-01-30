@@ -1,6 +1,11 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 
-from .models import Recipe, Ingredient, Tag, RecipeIngredient, Subscription, FavoriteRecipe, ShoppingCart
+from .models import (Ingredient, FavoriteRecipe, Recipe,
+                     RecipeIngredient, Subscription, ShoppingCart, Tag)
+
+
+admin.site.unregister(Group)
 
 
 class RecipeIngredientAdmin(admin.StackedInline):
@@ -30,20 +35,22 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='Ингредиенты')
     def get_ingredients(self, obj):
-        return ', '.join([ingredient.name for ingredient in obj.ingredients.all()])
-    
+        return ', '.join(
+            [ingredient.name for ingredient in obj.ingredients.all()]
+        )
+
     @admin.display(description='Количество избранных')
     def get_favorite_count(self, obj):
         return obj.favorite_recipe.count()
 
 
-@admin.register(Tag):
+@admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'color', 'slug')
     search_fields = ('name',)
 
 
-@admin.register(Ingredient):
+@admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit')
     search_fields = ('name',)
@@ -62,6 +69,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     def get_author(self, obj):
         return obj.author.email
 
+
 @admin.register(FavoriteRecipe)
 class FavoriteRecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'get_user', 'get_recipe', 'get_favorite_count')
@@ -76,10 +84,10 @@ class FavoriteRecipeAdmin(admin.ModelAdmin):
         return [
             f'{item["name"]} ' for item in obj.recipe.values('name')[:5]]
 
-
     @admin.display(description='Количество избранных')
     def get_favorite_count(self, obj):
         return obj.recipe.favorite_recipe.count()
+
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
