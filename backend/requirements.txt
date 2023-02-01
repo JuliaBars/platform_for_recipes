@@ -18,6 +18,7 @@ itypes==1.2.0
 Jinja2==3.1.2
 MarkupSafe==2.1.2
 oauthlib==3.2.2
+Pillow==9.4.0
 pycparser==2.21
 PyJWT==2.6.0
 python-dotenv==0.21.1
@@ -29,5 +30,6 @@ six==1.16.0
 social-auth-app-django==4.0.0
 social-auth-core==4.3.0
 sqlparse==0.4.3
+tzdata==2022.7
 uritemplate==4.1.1
 urllib3==1.26.14

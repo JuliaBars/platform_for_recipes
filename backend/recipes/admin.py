@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from .models import (Ingredient, FavoriteRecipe, Recipe,
-                     RecipeIngredient, Subscription, ShoppingCart, Tag)
+from recipes.models import (Ingredient, FavouriteRecipe, Recipe,
+                     RecipeIngredient, ShoppingCart, Tag)
+
+from users.models import Subscription
 
 
 admin.site.unregister(Group)
@@ -18,11 +20,11 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'get_author', 'name', 'text',
         'cooking_time', 'get_tags', 'get_ingredients',
-        'pub_date', 'get_favorite_count')
+        'get_favorite_count')
     search_fields = (
         'name', 'cooking_time',
         'author__email', 'ingredients__name')
-    list_filter = ('pub_date', 'tags',)
+    list_filter = ('tags',)
     inlines = (RecipeIngredientAdmin,)
 
     @admin.display(description='Email автора')
@@ -70,8 +72,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
         return obj.author.email
 
 
-@admin.register(FavoriteRecipe)
-class FavoriteRecipeAdmin(admin.ModelAdmin):
+@admin.register(FavouriteRecipe)
+class FavouriteRecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'get_user', 'get_recipe', 'get_favorite_count')
     search_fields = ('user__email', 'recipe__name')
 
