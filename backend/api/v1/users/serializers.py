@@ -4,7 +4,7 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.exceptions import ValidationError
 from users.models import Subscription
 from rest_framework import status
-# from recipes.serializers import RecipeBaseSerializer
+from api.v1.recipes.serializers import RecipeBaseSerializer
 
 
 User = get_user_model()
@@ -13,10 +13,15 @@ User = get_user_model()
 class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
-        fields = tuple(User.REQUIRED_FIELDS) + (
-            User.USERNAME_FIELD,
-            'password',
-        )
+        fields = (
+            'email', 'id', 'username', 'first_name', 'last_name', 'password')
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'email': {'required': True},
+            'username': {'required': True},
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+        }
 
 
 class CustomUserSerializer(UserSerializer):
@@ -68,11 +73,11 @@ class SubscribeSerializer(CustomUserSerializer):
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
-    # def get_recipes(self, obj):
-    #     request = self.context.get('request')
-    #     limit = request.GET.get('recipes_limit')
-    #     recipes = obj.recipes.all()
-    #     if limit:
-    #         recipes = recipes[:int(limit)]
-    #     serializer = RecipeBaseSerializer(recipes, many=True, read_only=True)
-    #     return serializer.data
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        recipes = obj.recipes.all()
+        if limit:
+            recipes = recipes[:int(limit)]
+        serializer = RecipeBaseSerializer(recipes, many=True, read_only=True)
+        return serializer.data

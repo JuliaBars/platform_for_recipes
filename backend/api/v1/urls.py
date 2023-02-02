@@ -1,16 +1,14 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-# from recipes.views import IngredientViewSet, RecipeViewSet, TagViewSet
-# from users.views import CustomUserViewSet
+from api.v1.recipes.views import IngredientViewSet, RecipeViewSet, TagViewSet
 
 
 router = DefaultRouter()
 
-# router.register('ingredients', IngredientViewSet)
-# router.register('tags', TagViewSet)
-# router.register('recipes', RecipeViewSet)
-# router.register('users', CustomUserViewSet)
+router.register('ingredients', IngredientViewSet)
+router.register('tags', TagViewSet)
+router.register('recipes', RecipeViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

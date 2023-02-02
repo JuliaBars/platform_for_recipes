@@ -7,6 +7,7 @@ coreschema==0.0.4
 cryptography==39.0.0
 defusedxml==0.7.1
 Django==4.1.5
+django-extra-fields==3.0.2
 django-filter==22.1
 django-rest-authtoken==2.1.4
 django-templated-mail==1.1.1

@@ -78,6 +78,12 @@ class Recipe(models.Model):
                 1, 
                 message='Время приготовления должно быть больше 0'),)
         )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата создания')
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Дата обновления')
 
     class Meta:
         verbose_name = 'Рецепт'
