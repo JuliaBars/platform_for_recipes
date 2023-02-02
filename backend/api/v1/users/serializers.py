@@ -4,7 +4,7 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.exceptions import ValidationError
 from users.models import Subscription
 from rest_framework import status
-from api.v1.recipes.serializers import RecipeBaseSerializer
+# from api.v1.recipes.serializers import RecipeBaseSerializer
 
 
 User = get_user_model()
@@ -42,7 +42,7 @@ class CustomUserSerializer(UserSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Subscription.objects.filter(user=user, author=obj).exists()
+        return Subscription.objects.filter(subscriber=user, author=obj).exists()
 
 
 class SubscribeSerializer(CustomUserSerializer):
@@ -73,11 +73,11 @@ class SubscribeSerializer(CustomUserSerializer):
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
-    def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
-        recipes = obj.recipes.all()
-        if limit:
-            recipes = recipes[:int(limit)]
-        serializer = RecipeBaseSerializer(recipes, many=True, read_only=True)
-        return serializer.data
+    # def get_recipes(self, obj):
+    #     request = self.context.get('request')
+    #     limit = request.GET.get('recipes_limit')
+    #     recipes = obj.recipes.all()
+    #     if limit:
+    #         recipes = recipes[:int(limit)]
+    #     serializer = RecipeBaseSerializer(recipes, many=True, read_only=True)
+    #     return serializer.data

@@ -1,3 +1,7 @@
+from datetime import datetime
+
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import F
@@ -10,6 +14,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
+from api.v1.users.serializers import CustomUserSerializer
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 User = get_user_model()
 
@@ -49,48 +56,22 @@ class RecipeIngredientSerializer(ModelSerializer):
 
 
 class RecipeSerializer(ModelSerializer):
-    ingredients = PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all(),
-        many=True,
-        required=True,
-    )
     tags = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True,
         required=True,
     )
-    author = UserSerializer(
+    author = CustomUserSerializer(
         read_only=True,
+    )
+    ingredients = PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(),
+        many=True,
+        required=True,
     )
     image = Base64ImageField(
         required=False,
     )
-
-    class Meta:
-        model = Recipe
-        fields = '__all__'
-
-
-
-class TagSerializer(ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ('id', 'name', 'color', 'slug')
-
-
-class RecipeListSerializer(ModelSerializer):
-    tags = TagSerializer(
-        many=True,
-        read_only=True,
-    )
-    ingredients = IngredientSerializer(
-        many=True,
-        read_only=True,
-    )
-    author = UserSerializer(
-        read_only=True,
-    )
-    image = Base64ImageField()
     is_favorite = SerializerMethodField(read_only=True)
     is_in_shopping_cart = SerializerMethodField(read_only=True)
 
@@ -98,17 +79,17 @@ class RecipeListSerializer(ModelSerializer):
         model = Recipe
         fields = (
             'id',
-            'name',
-            'image',
-            'author',
-            'cooking_time',
             'tags',
+            'author',
             'ingredients',
             'is_favorite',
             'is_in_shopping_cart',
-            'text'
+            'name',
+            'image',
+            'text',
+            'cooking_time',
         )
-    
+
     def get_ingredients(self, obj):
         recipe = obj
         ingredients = recipe.ingredients.values(
@@ -119,7 +100,7 @@ class RecipeListSerializer(ModelSerializer):
         )
         return ingredients
 
-    def get_is_favorited(self, obj):
+    def get_is_favorite(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
@@ -130,6 +111,46 @@ class RecipeListSerializer(ModelSerializer):
         if user.is_anonymous:
             return False
         return user.shopping_cart.filter(recipe=obj).exists()
+
+    def download_shopping_cart(self, request):
+        user = request.user
+        if not user.shopping_cart.exists():
+            return Response(status=HTTP_400_BAD_REQUEST)
+
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__shopping_cart__user=request.user
+        ).values(
+            'ingredient__name',
+            'ingredient__measurement_unit'
+        ).annotate(amount=Sum('amount'))
+
+        today = datetime.today()
+        shopping_list = (
+            f'Список покупок для: {user.get_full_name()}\n\n'
+            f'Дата: {today:%Y-%m-%d}\n\n'
+        )
+        shopping_list += '\n'.join([
+            f'- {ingredient["ingredient__name"]} '
+            f'({ingredient["ingredient__measurement_unit"]})'
+            f' - {ingredient["amount"]}'
+            for ingredient in ingredients
+        ])
+        shopping_list += f'\n\nFoodgram ({today:%Y})'
+
+        filename = f'{user.username}_shopping_list.txt'
+        response = HttpResponse(shopping_list, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+
+        return response
+
+
+
+class TagSerializer(ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('id', 'name', 'color', 'slug')
+
+
 
 
 class RecipeBaseSerializer(ModelSerializer):
