@@ -150,6 +150,7 @@ class FavouriteRecipe(models.Model):
 
 
 class ShoppingCart(models.Model):
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

@@ -17,8 +17,8 @@ class RecipeIngredientAdmin(admin.StackedInline):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'get_author', 'name', 'text',
-        'cooking_time', 'get_tags', 'get_ingredients',
-        'get_favorite_count')
+        'cooking_time', 'get_tags', 'get_ingredients')
+        #'get_favorite_count')
     search_fields = (
         'name', 'cooking_time',
         'author__email', 'ingredients__name')
@@ -39,9 +39,9 @@ class RecipeAdmin(admin.ModelAdmin):
             [ingredient.name for ingredient in obj.ingredients.all()]
         )
 
-    @admin.display(description='Количество избранных')
-    def get_favorite_count(self, obj):
-        return obj.favorite_recipe.count()
+    # @admin.display(description='Количество избранных')
+    # def get_favorite_count(self, obj):
+    #     return obj.favorite_recipe__user.count()
 
 
 @admin.register(Tag)
@@ -77,18 +77,18 @@ class FavouriteRecipeAdmin(admin.ModelAdmin):
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_user', 'get_recipe', 'get_count')
+    list_display = ('id', 'get_recipe', 'get_user', )
     search_fields = ('user__email', 'recipe__name')
 
     @admin.display(description='Email пользователя')
     def get_user(self, obj):
         return obj.user.email
 
+    
     @admin.display(description='Название рецепта')
     def get_recipe(self, obj):
-        return [
-            f'{item["name"]} ' for item in obj.recipe.values('name')[:5]]
+        return obj.recipe.name
 
-    @admin.display(description='Количество рецептов')
-    def get_count(self, obj):
-        return obj.recipe.count()
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(user=request.user)
