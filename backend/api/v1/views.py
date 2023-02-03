@@ -1,5 +1,6 @@
 from .pagination import CustomPagination
 from .serializers import CustomUserSerializer, SubscribeSerializer
+from rest_framework import filters
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -90,31 +91,20 @@ class CustomUserViewSet(UserViewSet):
 
         """
         user = request.user
-        print(user.__dict__, user)
         queryset = User.objects.filter(following__subscriber=user)
-        print(queryset.__dict__, queryset)
         pages = self.paginate_queryset(queryset)
-        print(request)
         serializer = SubscribeSerializer(pages,
                                          many=True,
-                                         context={'request': request})
-        print(serializer.data)                                 
+                                         context={'request': request})                            
         return self.get_paginated_response(serializer.data)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_class = IngredientFilter
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        query = self.request.query_params.get('query')
-        if query:
-            queryset = queryset.filter(name__istartswith=query)
-        return queryset
+    search_fields = ('^name',)
 
 
 class TagViewSet(ReadOnlyModelViewSet):

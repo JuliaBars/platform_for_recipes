@@ -58,7 +58,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(FavouriteRecipe)
 class FavouriteRecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_user', 'get_recipe', 'get_favorite_count')
+    list_display = ('id', 'get_user',)
     search_fields = ('user__email', 'recipe__name')
 
     @admin.display(description='Email пользователя')
@@ -67,12 +67,7 @@ class FavouriteRecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='Название рецепта')
     def get_recipe(self, obj):
-        return [
-            f'{item["name"]} ' for item in obj.recipe.values('name')[:5]]
-
-    @admin.display(description='Количество избранных')
-    def get_favorite_count(self, obj):
-        return obj.recipe.favorite_recipe.count()
+        return obj.recipe.name
 
 
 @admin.register(ShoppingCart)
