@@ -3,10 +3,6 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework.fields import SerializerMethodField
 from rest_framework.exceptions import ValidationError
 from users.models import Subscription
-from rest_framework import status
-from datetime import datetime
-from django.db.models import Sum
-from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import F
@@ -14,13 +10,10 @@ from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import Ingredient, RecipeIngredient, Recipe, Tag
-from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
-from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework import serializers
 
@@ -68,7 +61,10 @@ class SubscribeSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(
         default=serializers.CurrentUserDefault()
     )
-    subscriber = serializers.StringRelatedField(
+    subscriber = serializers.SlugRelatedField(
+        slug_field='email',
+        read_only=False,
+        queryset=Subscription.objects.all(),
         default=serializers.CurrentUserDefault()
     )
 
@@ -84,22 +80,9 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def validate_subscriber(self, value):
         print(self.context['request'])
         print(value)
-        if value == self.context['request'].author:
+        if value == self.context['request'].user:
             raise serializers.ValidationError('Нельзя подписаться на себя')
         return value
-
-    # def get_recipes_count(self, obj):
-    #     return obj.recipes.count()
-
-    # def get_recipes(self, obj):
-    #     request = self.context.get('request')
-    #     limit = request.GET.get('recipes_limit')
-    #     recipes = obj.recipes.all()
-    #     if limit:
-    #         recipes = recipes[:int(limit)]
-    #     serializer = RecipeBaseSerializer(
-    #         recipes, many=True, read_only=True)
-    #     return serializer.data
 
 
 class IngredientSerializer(ModelSerializer):

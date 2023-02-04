@@ -17,12 +17,12 @@ class RecipeIngredientAdmin(admin.StackedInline):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'get_author', 'name', 'text',
-        'cooking_time', 'get_tags', 'get_ingredients')
+        'cooking_time', 'get_tags', 'get_ingredients', 'get_favorite_count')
         #'get_favorite_count')
     search_fields = (
         'name', 'cooking_time',
         'author__email', 'ingredients__name')
-    list_filter = ('tags',)
+    list_filter = ('tags', 'author', 'name')
     inlines = (RecipeIngredientAdmin,)
 
     @admin.display(description='Email автора')
@@ -39,9 +39,9 @@ class RecipeAdmin(admin.ModelAdmin):
             [ingredient.name for ingredient in obj.ingredients.all()]
         )
 
-    # @admin.display(description='Количество избранных')
-    # def get_favorite_count(self, obj):
-    #     return obj.favorite_recipe__user.count()
+    @admin.display(description='Количество в избранных')
+    def get_favorite_count(self, obj):
+        return obj.favorite_recipes.count()
 
 
 @admin.register(Tag)
@@ -54,6 +54,7 @@ class TagAdmin(admin.ModelAdmin):
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit')
     search_fields = ('name',)
+    list_filter = ('name',)
 
 
 @admin.register(FavouriteRecipe)

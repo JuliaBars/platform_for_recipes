@@ -43,7 +43,7 @@ class CustomUserViewSet(UserViewSet):
         detail=True,
         methods=['post', 'delete'],
         permission_classes=(IsAuthenticated,),
-        serializer_class=SubscribeSerializer
+        serializer_class=SubscribeSerializer,
     )
     def subscribe(self, request, **kwargs):
         """Подписка на автора рецептов """
@@ -70,15 +70,8 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=[IsAuthenticated]
     )
     def subscriptions(self, request):
-        """Получение списка подписок пользователя
+        """Получение списка подписок пользователя"""
 
-        :param request: запрос
-        :return: список подписок пользователя
-        :raise: 404 если пользователь не найден
-        :raise: 403 если пользователь не авторизован
-        :permission: Аутентифицированный пользователь
-
-        """
         user = request.user
         queryset = User.objects.filter(following__subscriber=user)
         pages = self.paginate_queryset(queryset)
