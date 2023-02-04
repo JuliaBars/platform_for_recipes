@@ -21,6 +21,8 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.validators import UniqueTogetherValidator
+from rest_framework import serializers
 
 
 
@@ -62,43 +64,42 @@ class CustomUserSerializer(UserSerializer):
         return Subscription.objects.filter(subscriber=user, author=obj).exists()
 
 
-class SubscribeSerializer(CustomUserSerializer):
-    recipes_count = SerializerMethodField()
-    recipes = SerializerMethodField()
+class SubscribeSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(
+        default=serializers.CurrentUserDefault()
+    )
+    subscriber = serializers.StringRelatedField(
+        default=serializers.CurrentUserDefault()
+    )
 
-    class Meta(CustomUserSerializer.Meta):
-        fields = CustomUserSerializer.Meta.fields + (
-            'recipes_count', 'recipes'
-        )
-        read_only_fields = ('email', 'username')
+    class Meta():
+        model = Subscription
+        fields = ('author', 'subscriber')
+        read_only_fields = ('author',)
+        validators = [UniqueTogetherValidator(
+                      queryset=Subscription.objects.all(),
+                      fields=['subscriber', 'author']
+                      )]
+    
+    def validate_subscriber(self, value):
+        print(self.context['request'])
+        print(value)
+        if value == self.context['request'].author:
+            raise serializers.ValidationError('Нельзя подписаться на себя')
+        return value
 
-    def validate(self, data):
-        author = self.instance
-        user = self.context.get('request').user
-        if Subscription.objects.filter(author=author, user=user).exists():
-            raise ValidationError(
-                detail='Вы уже подписаны на этого пользователя!',
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        if user == author:
-            raise ValidationError(
-                detail='Вы не можете подписаться на самого себя!',
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        return data
+    # def get_recipes_count(self, obj):
+    #     return obj.recipes.count()
 
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
-
-    def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
-        recipes = obj.recipes.all()
-        if limit:
-            recipes = recipes[:int(limit)]
-        serializer = RecipeBaseSerializer(
-            recipes, many=True, read_only=True)
-        return serializer.data
+    # def get_recipes(self, obj):
+    #     request = self.context.get('request')
+    #     limit = request.GET.get('recipes_limit')
+    #     recipes = obj.recipes.all()
+    #     if limit:
+    #         recipes = recipes[:int(limit)]
+    #     serializer = RecipeBaseSerializer(
+    #         recipes, many=True, read_only=True)
+    #     return serializer.data
 
 
 class IngredientSerializer(ModelSerializer):

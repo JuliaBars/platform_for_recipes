@@ -29,7 +29,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (FavouriteSerializer, IngredientSerializer,
-                                        RecipeBaseSerializer, RecipeReadSerializer, RecipeWriteSerializer, ShoppingCartSerializer, TagSerializer)
+                          RecipeBaseSerializer, RecipeReadSerializer, RecipeWriteSerializer, ShoppingCartSerializer, TagSerializer)
 
 User = get_user_model()
 
@@ -42,39 +42,28 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated],
+        permission_classes=(IsAuthenticated,),
+        serializer_class=SubscribeSerializer
     )
     def subscribe(self, request, **kwargs):
-        """Подписка на автора
-
-        :param request: запрос
-        :param kwargs: id автора
-        :return: подписка на автора
-        :raise: 404 если автор не найден
-        :raise: 400 если запрос не POST или DELETE
-        :raise: 400 если данные не валидны
-        :raise: 400 если подписка уже существует
-        :raise: 400 если подписка не существует
-
-        """
+        """Подписка на автора рецептов """
         user = request.user
         author_id = self.kwargs.get('id')
         author = get_object_or_404(User, id=author_id)
 
-        if request.method == 'POST':
-            serializer = SubscribeSerializer(author,
-                                             data=request.data,
-                                             context={"request": request})
-            serializer.is_valid(raise_exception=True)
-            Subscription.objects.create(subscriber=user, author=author)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        if request.method == 'DELETE':
-            subscription = get_object_or_404(Subscription,
-                                             subscriber=user,
-                                             author=author)
-            subscription.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        serializer = self.get_serializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            if request.method == 'POST':
+                Subscription.objects.get_or_create(
+                    subscriber=user, author=author)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                Subscription.objects.filter(
+                    subscriber=user, author=author).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=False,
@@ -95,7 +84,7 @@ class CustomUserViewSet(UserViewSet):
         pages = self.paginate_queryset(queryset)
         serializer = SubscribeSerializer(pages,
                                          many=True,
-                                         context={'request': request})                            
+                                         context={'request': request})
         return self.get_paginated_response(serializer.data)
 
 
@@ -169,4 +158,3 @@ class RecipeViewSet(ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({'errors': 'Рецепт уже удален!'},
                         status=status.HTTP_400_BAD_REQUEST)
-
