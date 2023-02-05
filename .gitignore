@@ -130,3 +130,6 @@ dmypy.json
 
 # .idea
 .idea
+
+.media/
+backend/media/recipes/5ab8cb14-c57b-4160-a5c8-17b9ada2f4c1.jpg
