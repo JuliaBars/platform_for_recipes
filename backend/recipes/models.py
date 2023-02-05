@@ -7,6 +7,7 @@ User = get_user_model()
 
 
 class Ingredient(models.Model):
+
     name = models.CharField(
         max_length=200,
         verbose_name='Название ингредиента')
@@ -75,9 +76,9 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         validators=(
             MinValueValidator(
-                1, 
+                1,
                 message='Время приготовления должно быть больше 0'),)
-        )
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата создания')
@@ -172,5 +173,3 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return f'{self.user} добавил "{self.recipe}" в Корзину покупок'
-
-   

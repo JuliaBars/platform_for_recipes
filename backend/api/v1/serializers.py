@@ -18,7 +18,6 @@ from rest_framework.validators import UniqueTogetherValidator
 from rest_framework import serializers
 
 
-
 User = get_user_model()
 
 
@@ -54,7 +53,8 @@ class CustomUserSerializer(UserSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Subscription.objects.filter(subscriber=user, author=obj).exists()
+        return Subscription.objects.filter(
+            subscriber=user, author=obj).exists()
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -67,22 +67,33 @@ class SubscribeSerializer(serializers.ModelSerializer):
         queryset=Subscription.objects.all(),
         default=serializers.CurrentUserDefault()
     )
+    # recipes_count = SerializerMethodField()
+    recipes = SerializerMethodField()
 
     class Meta():
         model = Subscription
-        fields = ('author', 'subscriber')
+        fields = ('author', 'subscriber', 'recipes')
         read_only_fields = ('author',)
         validators = [UniqueTogetherValidator(
                       queryset=Subscription.objects.all(),
                       fields=['subscriber', 'author']
                       )]
-    
+
     def validate_subscriber(self, value):
         print(self.context['request'])
         print(value)
         if value == self.context['request'].user:
             raise serializers.ValidationError('Нельзя подписаться на себя')
         return value
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        recipes = Recipe.objects.filter(author=obj.author)
+        if limit:
+            recipes = recipes[:int(limit)]
+        serializer = RecipeBaseSerializer(recipes, many=True, read_only=True)
+        return serializer.data
 
 
 class IngredientSerializer(ModelSerializer):
@@ -160,6 +171,7 @@ class IngredientInRecipeWriteSerializer(ModelSerializer):
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
+
 
 class RecipeWriteSerializer(ModelSerializer):
     tags = PrimaryKeyRelatedField(queryset=Tag.objects.all(),
@@ -254,6 +266,7 @@ class RecipeWriteSerializer(ModelSerializer):
         context = {'request': request}
         return RecipeReadSerializer(instance,
                                     context=context).data
+
 
 class RecipeBaseSerializer(ModelSerializer):
     class Meta:
