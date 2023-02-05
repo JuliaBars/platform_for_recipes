@@ -1,35 +1,28 @@
-from .pagination import CustomPagination
-from .serializers import CustomUserSerializer, SubscribeSerializer
-from rest_framework import filters
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
-from rest_framework import status
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
-
-from users.models import Subscription
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import (FavouriteRecipe, Ingredient, RecipeIngredient,
-                            Recipe, ShoppingCart, Tag)
-from rest_framework import status
+from djoser.views import UserViewSet
+from recipes.models import (FavouriteRecipe, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart, Tag)
+from rest_framework import filters, status
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from users.models import Subscription
 
 from .filters import IngredientFilter, RecipeFilter
+from .pagination import CustomPagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeBaseSerializer,
-                          RecipeReadSerializer, RecipeWriteSerializer,
+from .serializers import (CustomUserSerializer, IngredientSerializer,
+                          RecipeBaseSerializer, RecipeReadSerializer,
+                          RecipeWriteSerializer, SubscribeSerializer,
                           TagSerializer)
 
 User = get_user_model()
@@ -51,23 +44,22 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         author_id = self.kwargs.get('id')
         author = get_object_or_404(User, id=author_id)
-        print(author)
-
-        serializer = self.get_serializer(data=request.data)
-        print(dir(request))
-        if serializer.is_valid():
-            if request.method == 'POST':
-                Subscription.objects.get_or_create(
-                    subscriber=user, author=author)
-                return Response(
-                    serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                Subscription.objects.filter(
-                    subscriber=user, author=author).delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
+        if user == author:
+            return Response({
+                'errors': 'You cannot subscribe on yourself'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if request.method == 'POST':
+            subscription, _ = Subscription.objects.get_or_create(
+                subscriber=user, author=author)
+            serializer = self.get_serializer(
+                subscription, context={'request': request}
+            )
             return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            Subscription.objects.filter(
+                subscriber=user, author=author).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False,
@@ -104,8 +96,8 @@ class TagViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPagination
-    permission_classes = [IsAuthorOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
+    permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
     def perform_create(self, serializer):

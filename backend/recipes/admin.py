@@ -1,9 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from recipes.models import (Ingredient, FavouriteRecipe, Recipe,
-                     RecipeIngredient, ShoppingCart, Tag)
-
+from recipes.models import (FavouriteRecipe, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart, Tag)
 
 admin.site.unregister(Group)
 
@@ -18,7 +17,6 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'get_author', 'name', 'text',
         'cooking_time', 'get_tags', 'get_ingredients', 'get_favorite_count')
-        #'get_favorite_count')
     search_fields = (
         'name', 'cooking_time',
         'author__email', 'ingredients__name')
@@ -59,7 +57,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(FavouriteRecipe)
 class FavouriteRecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_user',)
+    list_display = ('id', 'get_recipe', 'date', 'get_user')
     search_fields = ('user__email', 'recipe__name')
 
     @admin.display(description='Email пользователя')
@@ -69,6 +67,10 @@ class FavouriteRecipeAdmin(admin.ModelAdmin):
     @admin.display(description='Название рецепта')
     def get_recipe(self, obj):
         return obj.recipe.name
+
+    @admin.display(description='Дата создания')
+    def date(self, obj):
+        return obj.recipe.created_at
 
 
 @admin.register(ShoppingCart)
@@ -80,7 +82,6 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     def get_user(self, obj):
         return obj.user.email
 
-    
     @admin.display(description='Название рецепта')
     def get_recipe(self, obj):
         return obj.recipe.name

@@ -1,23 +1,17 @@
 from django.contrib.auth import get_user_model
-from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.fields import SerializerMethodField
-from rest_framework.exceptions import ValidationError
-from users.models import Subscription
-from recipes.models import Recipe
-from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Ingredient, RecipeIngredient, Recipe, Tag
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 from rest_framework.validators import UniqueTogetherValidator
-from rest_framework import serializers
-
+from users.models import Subscription
 
 User = get_user_model()
 
@@ -59,9 +53,7 @@ class CustomUserSerializer(UserSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(
-        default=serializers.CurrentUserDefault()
-    )
+    author = serializers.StringRelatedField()
     subscriber = serializers.SlugRelatedField(
         slug_field='email',
         read_only=False,
@@ -80,14 +72,15 @@ class SubscribeSerializer(serializers.ModelSerializer):
                       fields=['subscriber', 'author']
                       )]
 
-    def validate_subscriber(self, value):
-        print(self.context['request'])
-        print(value)
-        if value == self.context['request'].user:
-            raise serializers.ValidationError('Нельзя подписаться на себя')
-        return value
+    # def validate_subscriber(self, value):
+    #     print(self.context['request'])
+    #     print(value)
+    #     if value == self.context['request'].user:
+    #         raise serializers.ValidationError('Нельзя подписаться на себя')
+    #     return value
 
     def get_recipes(self, obj):
+        print(obj)
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
         recipes = Recipe.objects.filter(author=obj.author)
