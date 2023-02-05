@@ -51,9 +51,10 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         author_id = self.kwargs.get('id')
         author = get_object_or_404(User, id=author_id)
+        print(author)
 
         serializer = self.get_serializer(data=request.data)
-        print(serializer)
+        print(dir(request))
         if serializer.is_valid():
             if request.method == 'POST':
                 Subscription.objects.get_or_create(

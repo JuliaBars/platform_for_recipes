@@ -3,6 +3,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework.fields import SerializerMethodField
 from rest_framework.exceptions import ValidationError
 from users.models import Subscription
+from recipes.models import Recipe
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import F
@@ -67,12 +68,12 @@ class SubscribeSerializer(serializers.ModelSerializer):
         queryset=Subscription.objects.all(),
         default=serializers.CurrentUserDefault()
     )
-    # recipes_count = SerializerMethodField()
+    recipes_count = SerializerMethodField()
     recipes = SerializerMethodField()
 
     class Meta():
         model = Subscription
-        fields = ('author', 'subscriber', 'recipes')
+        fields = ('author', 'subscriber', 'recipes', 'recipes_count')
         read_only_fields = ('author',)
         validators = [UniqueTogetherValidator(
                       queryset=Subscription.objects.all(),
@@ -94,6 +95,9 @@ class SubscribeSerializer(serializers.ModelSerializer):
             recipes = recipes[:int(limit)]
         serializer = RecipeBaseSerializer(recipes, many=True, read_only=True)
         return serializer.data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj.author).count()
 
 
 class IngredientSerializer(ModelSerializer):
