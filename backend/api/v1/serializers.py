@@ -53,7 +53,11 @@ class CustomUserSerializer(UserSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField()
+    # для автора, на которого идет подписка должны быть выведены все
+    # обязательные поля
+    # подписчика выводит не надо, он долджен быть получен как request.user
+    author = CustomUserSerializer(read_only=True)
+    # author = serializers.StringRelatedField()
     subscriber = serializers.SlugRelatedField(
         slug_field='email',
         read_only=False,
@@ -71,6 +75,16 @@ class SubscribeSerializer(serializers.ModelSerializer):
                       queryset=Subscription.objects.all(),
                       fields=['subscriber', 'author']
                       )]
+
+    # class Meta(CustomUserSerializer.Meta):
+    #     fields = CustomUserSerializer.Meta.fields + (
+    #         'recipes_count', 'recipes'
+    #     )
+    #     read_only_fields = ('email', 'username')
+    #     validators = [UniqueTogetherValidator(
+    #                   queryset=Subscription.objects.all(),
+    #                   fields=['subscriber', 'author']
+    #                   )]
 
     # def validate_subscriber(self, value):
     #     print(self.context['request'])
