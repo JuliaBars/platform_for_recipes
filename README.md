@@ -7,8 +7,9 @@ _Репозиторий на Github [ссылка](https://github.com/JuliaBars/
 
 ```
 В папке infra выполните команду docker-compose up
-Пройдите по [ссылке](http://localhost/api/docs/redoc.html).
 ```
+Пройдите по [ссылке](http://localhost/api/docs/redoc.html).
+
 
 Основные эндпоинты проекта:
 
