@@ -6,13 +6,15 @@ _Репозиторий на Github [ссылка](https://github.com/JuliaBars/
 Чтобы получить документацию к проекту:
 
 ```
-В папке infra выполните команду docker-compose up.
+В папке infra выполните команду docker-compose up
+Пройдите по [ссылке](http://localhost/api/docs/redoc.html).
 ```
 
 Основные эндпоинты проекта:
 
 ```
 http://localhost/api/users/
+http://localhost/api/auth/token/login/
 http://localhost/api/tags/
 http://localhost/api/recipes/
 http://localhost/api/recipes/download_shopping_cart/
@@ -25,7 +27,7 @@ http://localhost/api/ingredients/
 Из директории с файлом manage.py выполните команду:
 
 ```
-python manage.py loaddata dump.json
+python manage.py loaddata fixtures.json
 ```
 
 ### Шаблон заполнения .env в директории infra/.env
