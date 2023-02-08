@@ -47,7 +47,7 @@ jobs:
   backend_build_and_push:
     name: Build and Push Backend
     runs-on: ubuntu-latest
-    needs: test
+    needs: tests
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
     steps:
       - name: Check out the repo
