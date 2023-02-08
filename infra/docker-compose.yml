@@ -31,13 +31,13 @@ services:
   #   volumes:
   #     - ../frontend/:/app/result_build/
 
-  migrate-and-collectstatic:
-    image: juliasnowbars/foodgram_backend:latest
-    command:
-      - python manage.py migrate --noinput
-      - python manage.py collectstatic --noinput
-    depends_on:
-      - db
+  # migrate-and-collectstatic:
+  #   image: juliasnowbars/foodgram_backend:latest
+  #   command:
+  #     - python manage.py migrate --noinput
+  #     - python manage.py collectstatic --noinput
+  #   depends_on
+  #     - db
 
   nginx:
     image: nginx:1.21.3-alpine
@@ -49,6 +49,7 @@ services:
       # - ../docs/:/usr/share/nginx/html/api/docs/
       - foodgram_static:/var/html/static/
       - foodgram_media:/var/html/media/
+      - foodgram_frontend:/var/html/frontend/
       - foodgram_redoc:/usr/share/nginx/html/api/docs/
     depends_on:
       - backend
