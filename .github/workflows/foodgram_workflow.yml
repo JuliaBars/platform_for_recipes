@@ -77,7 +77,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "infra/docker-compose.yml"
+          source: "infra/docker-compose.yaml"
           target: "."
           strip_components: 1
 
