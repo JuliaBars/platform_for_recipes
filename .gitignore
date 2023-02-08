@@ -137,3 +137,8 @@ bug_report.py
 backend/media/recipes/1664416251_30-podacha-blud-com-p-tort-pirozhnoe-foto-31.jpg
 backend/media/recipes/Tiramisu-585178794.jpg
 backend/media/recipes/9d13332ef77b99d5b51a6ad45e2f6055.jpeg
+
+.vscode/
+*.code-workspace
+
+tests/

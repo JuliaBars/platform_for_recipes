@@ -10,6 +10,7 @@ admin.site.unregister(Group)
 class RecipeIngredientAdmin(admin.StackedInline):
     model = RecipeIngredient
     autocomplete_fields = ('ingredient',)
+    min_num = 1
 
 
 @admin.register(Recipe)
