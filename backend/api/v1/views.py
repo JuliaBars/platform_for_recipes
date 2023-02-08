@@ -57,10 +57,11 @@ class CustomUserViewSet(UserViewSet):
             )
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED)
-        else:
+        if request.method == 'DELETE':
             Subscription.objects.filter(
                 subscriber=user, author=author).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=False,
@@ -120,8 +121,9 @@ class RecipeViewSet(ModelViewSet):
     def favorite(self, request, pk):
         if request.method == 'POST':
             return self.add_to(FavouriteRecipe, request.user, pk)
-        else:
+        if request.method == 'DELETE':
             return self.delete_from(FavouriteRecipe, request.user, pk)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
@@ -131,8 +133,9 @@ class RecipeViewSet(ModelViewSet):
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
             return self.add_to(ShoppingCart, request.user, pk)
-        else:
+        if request.method == 'DELETE':
             return self.delete_from(ShoppingCart, request.user, pk)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def add_to(self, model, user, pk):
         if model.objects.filter(user=user, recipe__id=pk).exists():
