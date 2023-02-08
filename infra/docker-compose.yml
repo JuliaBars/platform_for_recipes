@@ -21,11 +21,15 @@ services:
       - ./.env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: juliasnowbars/foodgram_frontend:latest
     volumes:
-      - ../frontend/:/app/result_build/
+      - foodgram_frontend:/app/build
+  # frontend:
+  #   build:
+  #     context: ../frontend
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ../frontend/:/app/result_build/
 
   migrate-and-collectstatic:
     image: juliasnowbars/foodgram_backend:latest
@@ -55,3 +59,4 @@ volumes:
   foodgram_media:
   foodgram_db:
   foodgram_redoc:
+  foodgram_frontend:
