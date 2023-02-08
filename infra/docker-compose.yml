@@ -13,8 +13,6 @@ services:
     restart: always
     volumes:
       - foodgram_static:/app/static/
-      - foodgram_media:/app/media/
-      - foodgram_redoc:/app/api/docs/
     depends_on:
       - db
     env_file:
@@ -50,7 +48,6 @@ services:
       - foodgram_static:/var/html/static/
       - foodgram_media:/var/html/media/
       - foodgram_frontend:/var/html/frontend/
-      - foodgram_redoc:/usr/share/nginx/html/api/docs/
     depends_on:
       - backend
     restart: always
@@ -59,5 +56,4 @@ volumes:
   foodgram_static:
   foodgram_media:
   foodgram_db:
-  foodgram_redoc:
   foodgram_frontend:

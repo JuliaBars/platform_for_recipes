@@ -66,6 +66,20 @@ jobs:
           tags: juliasnowbars/foodgram_backend:latest
           file: backend/Dockerfile
 
+  copy_compose:
+    name: Copy compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: copy file via ssh password
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "infra/docker-compose.yml"
+          target: "~/docker-compose.yaml"
+
   deploy:
     runs-on: ubuntu-latest
     needs: backend_build_and_push
