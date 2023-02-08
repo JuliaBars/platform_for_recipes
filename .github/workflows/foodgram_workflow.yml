@@ -78,7 +78,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "infra/docker-compose.yml"
-          target: "docker-compose.yaml"
+          target: "."
 
   copy_nginx_conf:
     name: Copy nginx config
@@ -92,7 +92,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "infra/nginx.conf"
-          target: "nginx/default.conf"
+          target: "nginx"
 
   deploy:
     runs-on: ubuntu-latest
