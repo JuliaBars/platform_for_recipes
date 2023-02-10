@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-+1!$%&^&*()_+')
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 # CSRF_TRUSTED_ORIGINS = ['http://*']
-# # CSRF_TRUSTED_ORIGINS = ['http://158.160.24.150:83/']
+CSRF_TRUSTED_ORIGINS = ['http://158.160.24.150:83']
 # CSRF_COOKIE_DOMAIN = '158.160.24.150'
 # CORS_ORIGIN_ALLOW_ALL = True
 
