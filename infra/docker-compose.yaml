@@ -34,7 +34,7 @@ services:
       - ./frontend/build:/usr/share/nginx/html/
       - ./docs/:/usr/share/nginx/html/api/docs/
       - foodgram_static:/var/html/static_backend/
-    #  - foodgram_media:/var/html/media/
+      - foodgram_media:/var/html/media/
     depends_on:
       - backend
     restart: always
