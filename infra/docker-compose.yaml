@@ -13,8 +13,7 @@ services:
     restart: always
     volumes:
       - foodgram_static:/app/static_backend/
-    # ports:
-    #   - 11003:11003
+      - foodgram_media:/app/media/
     depends_on:
       - db
     env_file:
