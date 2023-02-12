@@ -92,7 +92,6 @@ class IngredientViewSet(ModelViewSet):
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    pagination_class = CustomPagination
 
 
 class RecipeViewSet(ModelViewSet):
