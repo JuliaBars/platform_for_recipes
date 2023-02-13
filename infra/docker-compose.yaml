@@ -20,7 +20,7 @@ services:
       - ./.env
 
   frontend:
-    image: juliasnowbars/foodgram_frontend:working
+    image: juliasnowbars/foodgram_frontend:latest
     volumes:
       - ./frontend/:/app/result_build/
 
