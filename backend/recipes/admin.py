@@ -23,9 +23,9 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ('tags', 'author', 'name')
     inlines = (RecipeIngredientAdmin,)
 
-    @admin.display(description='Email автора')
+    @admin.display(description='Автор')
     def get_author(self, obj):
-        return obj.author.email
+        return obj.author.username
 
     @admin.display(description='Теги')
     def get_tags(self, obj):
