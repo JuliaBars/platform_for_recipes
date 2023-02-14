@@ -18,7 +18,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'id', 'get_author', 'name', 'text',
         'cooking_time', 'get_tags', 'get_ingredients', 'get_favorite_count')
     search_fields = (
-        'name', 'cooking_time', 'tags'
+        'name', 'cooking_time', 'tags__name',
         'author__email', 'ingredients__name')
     list_filter = ('tags', 'author', 'name')
     inlines = (RecipeIngredientAdmin,)
