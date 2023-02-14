@@ -32,7 +32,12 @@ class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     pagination_class = CustomPagination
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    # permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action in ('subscribe', 'subscriptions'):
+            return [IsAuthenticated()]
+        return super().get_permissions()
 
     @action(
         detail=True,
