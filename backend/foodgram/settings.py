@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+# Файл надо бы почистить от мусора
 import os
 from pathlib import Path
 
@@ -29,6 +29,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-+1!$%&^&*()_+')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+# Следующий строки -- отличные кандидаты на то, чтобы спрятать их тоже в переменные окружения. 
+# Безопасность превыше всего
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['http://158.160.24.150:83']
 
@@ -86,6 +88,9 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# Удобно иметь более гибкий файл. Для этого стоит завести еще одну
+# переменную окрежния, по которой будет настроена или постгрес для прода
+# или sqlite для локально разработки
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),

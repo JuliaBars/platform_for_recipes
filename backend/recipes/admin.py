@@ -46,7 +46,12 @@ class RecipeAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'color', 'slug')
     search_fields = ('name',)
-
+    # Для поля цвета можно сделать палитру цвета в админке для тега.
+    # Для этого нужно сделать метод, в котором будет чтото такое:
+    # return format_html(
+    #         f'<spawn style="color: {obj.color};">{obj.color}</spawn>'
+    #     )
+    # format_html живет в from django.utils.html
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
