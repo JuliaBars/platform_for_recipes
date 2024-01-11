@@ -1,3 +1,4 @@
+# Тут беда с пепом
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import F
@@ -16,6 +17,7 @@ from users.models import Subscription
 User = get_user_model()
 
 
+# Лишний сериализатор. Встроенный в djoser отлично сам справится.
 class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
@@ -30,6 +32,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         }
 
 
+# Избыточное наследование от djoser. Хватит и обычного модельного. 
 class CustomUserSerializer(UserSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
 
@@ -46,12 +49,16 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
+        # 1. Имхо, логичнее писать "если пользователь не авторизован", а не "анонимный ли пользователь"
+        # 2. Учимся писать сложные return. Тут он будет хорошо смотреться.
         if user.is_anonymous:
             return False
         return Subscription.objects.filter(
             subscriber=user, author=obj).exists()
 
 
+# Соддом и гомора. Наследуй от сериализатора выше. Параметр source может использоваться 
+# в serializer.save(). Класс станет значительно короче и читаемее.
 class SubscribeSerializer(serializers.ModelSerializer):
     email = serializers.StringRelatedField(source='author.email')
     id = serializers.PrimaryKeyRelatedField(source='author.id', read_only=True)
@@ -69,6 +76,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
             'last_name', 'is_subscribed', 'recipes', 'recipes_count'
         )
         read_only_fields = ('author',)
+        # Мне не нравится форматирование. Тут стиль отличается от стиля выше.
         validators = [UniqueTogetherValidator(
                       queryset=Subscription.objects.all(),
                       fields=['subscriber', 'author']
@@ -79,6 +87,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         limit = request.GET.get('recipes_limit')
         recipes = obj.author.recipes.all()
         if limit:
+            # А если не сможет скастовать в int, то все сломается
             recipes = recipes[:int(limit)]
         serializer = RecipeBaseSerializer(recipes, many=True, read_only=True)
         return serializer.data
@@ -153,7 +162,7 @@ class RecipeReadSerializer(ModelSerializer):
         if user.is_anonymous:
             return False
         return user.favorite_recipes.filter(recipe=obj).exists()
-
+    # Метод-дуль предыдущего. Учись видеть общий код. Не всегда это нужно, но для тренировки почему бы и нет? :) 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous:
@@ -163,7 +172,7 @@ class RecipeReadSerializer(ModelSerializer):
 
 class IngredientInRecipeWriteSerializer(ModelSerializer):
     id = IntegerField(write_only=True)
-
+    # Валидация количества нужна. 
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
@@ -175,7 +184,7 @@ class RecipeWriteSerializer(ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientInRecipeWriteSerializer(many=True)
     image = Base64ImageField()
-
+    # Валидация времени приготовления нужна.
     class Meta:
         model = Recipe
         fields = (
@@ -202,6 +211,7 @@ class RecipeWriteSerializer(ModelSerializer):
                 raise ValidationError({
                     'ingredients': 'Ингридиенты не могут повторяться!'
                 })
+            # Гарантированно ли тут всегда в item['amount'] строковое представление числа? :) 
             if int(item['amount']) <= 0:
                 raise ValidationError({
                     'amount': 'Количество ингредиента должно быть больше 0!'
@@ -224,6 +234,9 @@ class RecipeWriteSerializer(ModelSerializer):
             tags_list.append(tag)
         return value
 
+    # Это статический метод
+    # Декоратор ниже крутой, но чет я почти уверен, что джанга тут справится сама. 
+    # Атомарность может сломать производительность. Просто стоит про это помнить.
     @transaction.atomic
     def create_ingredients_amounts(self, ingredients, recipe):
         RecipeIngredient.objects.bulk_create(

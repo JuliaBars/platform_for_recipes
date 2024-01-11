@@ -11,6 +11,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        # Бессмысленная сортировка. Ты не контролируешь это поле. Везде аналогично.
         ordering = ('id',)
 
     def __str__(self):
@@ -31,6 +32,7 @@ class Subscription(models.Model):
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         ordering = ('-id',)
+        # Сейчас можно подписаться на самого себя. Как минимум, в админке. Юзай CheckConstraint или переопредели clean() модели.
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'subscriber'],

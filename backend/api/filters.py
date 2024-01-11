@@ -14,6 +14,7 @@ class IngredientFilter(FilterSet):
 
 
 class RecipeFilter(FilterSet):
+    # Тут чуть короче будет юзать AllValuesMultipleFilter
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
@@ -33,6 +34,16 @@ class RecipeFilter(FilterSet):
         if value and not user.is_anonymous:
             return queryset.filter(favorite_recipes__user=user)
         return queryset
+
+    # Код этого и предыдущего фильтров одинаковый за исключением параметров фильтра. Избавься от дублирования. 
+    # Тут поможет распаковка словарей и вот этот трюк:
+
+    # queryset.filter(favorited__user=self.request.user)  
+
+    # это тоже самое, что
+
+    # filter_parameters = {"favorited__user": self.request.user}
+    # queryset.filter(**filter_parameters)  
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user

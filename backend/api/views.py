@@ -40,6 +40,7 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated,),
         serializer_class=SubscribeSerializer,
     )
+    # Если извернуться, то можно код и этого метода вынести в общий миксин, как методы add_to и delete_to ниже
     def subscribe(self, request, **kwargs):
         """Подписка на автора рецептов """
         user = request.user
@@ -57,6 +58,7 @@ class CustomUserViewSet(UserViewSet):
             )
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED)
+        # Ненужная проверка. см строку 39
         if request.method == 'DELETE':
             Subscription.objects.filter(
                 subscriber=user, author=author).delete()
@@ -70,7 +72,7 @@ class CustomUserViewSet(UserViewSet):
     def subscriptions(self, request):
         """Получение списка подписок пользователя"""
 
-        user = request.user
+        user = request.user # Ненужная переменная
         queryset = Subscription.objects.filter(subscriber=user)
         pages = self.paginate_queryset(queryset)
         serializer = SubscribeSerializer(pages,
@@ -96,7 +98,7 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    queryset = Recipe.objects.prefetch_related('tags', 'ingredients')
+    queryset = Recipe.objects.prefetch_related('tags', 'ingredients') # тут можно еще select_related по тегам.
     pagination_class = CustomPagination
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -158,6 +160,8 @@ class RecipeViewSet(ModelViewSet):
         detail=False,
         permission_classes=[IsAuthenticated]
     )
+    # А вот тут логику создания файла лучше выкинуть в отдельный метод или функцию. 
+    # Так легче тест будет написать. 
     def download_shopping_cart(self, request):
         user = request.user
         if not user.shopping_cart.exists():
@@ -185,6 +189,7 @@ class RecipeViewSet(ModelViewSet):
         shopping_list += f'\n\nFoodgram ({today:%Y})'
 
         filename = f'{user.username}_shopping_list.txt'
+        # Создаем файл, значит удобнее FileResponse
         response = HttpResponse(shopping_list, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filename}'
 

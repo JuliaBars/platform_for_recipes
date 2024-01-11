@@ -4,7 +4,7 @@ from django.db import models
 
 User = get_user_model()
 
-
+# Все констаты стоит вытащить в отдельный файл в папку проекта (foodgram). Не дублируй.
 class Ingredient(models.Model):
     """Ингредиенты рецепта."""
     name = models.CharField(
@@ -29,6 +29,7 @@ class Tag(models.Model):
         unique=True,
         max_length=200,
         verbose_name='Название тега')
+    # цвета #cccccc и, например, #CCCcCc -- одинаковые. Сейчас это не учитывается.
     color = models.CharField(
         max_length=7,
         verbose_name='Цвет тега в HEX формате',
@@ -153,6 +154,8 @@ class FavouriteRecipe(models.Model):
                 f'рецепт {self.recipe} в избранное')
 
 
+# Класс-дубль предыдущего. Попробуй с помощью %(class) и/или %(model) 
+# сделать базоый класс, от которого потом унаследуешь и корзину, и избранное
 class ShoppingCart(models.Model):
     """Корзина."""
     user = models.ForeignKey(
