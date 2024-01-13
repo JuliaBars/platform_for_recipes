@@ -62,7 +62,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
     recipes_count = SerializerMethodField()
     recipes = SerializerMethodField()
 
-    class Meta():
+    class Meta:
         model = Subscription
         fields = (
             'email', 'id', 'username', 'first_name',
@@ -284,7 +284,7 @@ class ShoppingCartSerializer(ModelSerializer):
         return data
 
 
-class FavouriteSerializer(ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
+# class FavouriteSerializer(ModelSerializer):
+#     class Meta:
+#         model = Recipe
+#         fields = ('id', 'name', 'image', 'cooking_time')

@@ -144,3 +144,10 @@ backend/media/recipes/9d13332ef77b99d5b51a6ad45e2f6055.jpeg
 tests/
 infra/docker-compose-local.yml
 infra/nginx_local_front.conf
+static_backend/
+
+nginx-local-start.conf
+docker-compose-local-start.yml
+docker-compose-quality.yml
+config_for_59.py
+nginx-quality.conf

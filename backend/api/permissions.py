@@ -18,6 +18,8 @@ class IsAuthorOrReadOnly(BasePermission):
 
 class IsAuthenticatedOrReadOnly(BasePermission):
     def has_permission(self, request, view):
+        if view.action == 'me':
+            return False
         return bool(
             request.method in SAFE_METHODS
             or request.user
