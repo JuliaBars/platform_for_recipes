@@ -1,5 +1,5 @@
 ***
-_Репозиторий на Github [ссылка](https://github.com/JuliaBars/foodgram-project-react)._
+_Репозиторий на Github [ссылка](https://github.com/JuliaBars/platform_for_recipes)._
 
 ## Проект Foodgram
 
@@ -7,26 +7,36 @@ _Репозиторий на Github [ссылка](https://github.com/JuliaBars/
 
 Foodgram - продуктовый помощник с базой кулинарных рецептов. Позволяет публиковать рецепты, сохранять избранные, а также формировать список покупок для выбранных рецептов. Можно подписываться на авторов любимых рецептов.
 
-Получить документацию к проекту можно по [ссылке](http://91.239.26.38/api/docs/)
-
-Проект доступен по [ссылке](http://91.239.26.38/recipes)
-
-В проекте создан админ с логином: reviewer@thebest.ru, паролем cat12345
-Тестовый юзер, имеющий подписки, рецепты: mouse@mouse.ru, паролем dog12345
-
 ----
-
 ## Технологии
 
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
-![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
-![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
-![Debian](https://img.shields.io/badge/Debian-D70A53?style=for-the-badge&logo=debian&logoColor=white)
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white) ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Debian](https://img.shields.io/badge/Debian-D70A53?style=for-the-badge&logo=debian&logoColor=white)![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
 
-Развернуть проект на удаленном сервере:
+---
+#### Развернуть проект локально:
+- склонируйте проект
+```
+git clone https://github.com/JuliaBars/platform_for_recipes
+```
+- Добавьте файл .env в папку infra/
+```DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=foodgram
+DB_HOST=db
+DB_PORT=5432
+DEBUG=False
+```
+- Запустите docker compose local из директории infra/
+```
+docker compose -f docker-compose-local.yml up -d
+```
+- При первом старте загрузите ингредиенты в БД, выполните команду из директории infra/, после загрузки все данные будут храниться в volume:
+```
+./load_ingredients
+```
+---
+#### Развернуть проект на удаленном сервере:
 
 - Клонировать репозиторий:
 
@@ -78,7 +88,7 @@ python manage.py loaddata fixtures.json
 ```
 
 ---
-В проекте настроен CI CD с гитхаб Actions.
+В проекте настроен CI/CD с гитхаб Actions.
 После каждого обновления репозитория (push в ветку main) будет происходить:
 
 1. Проверка кода на соответствие стандарту PEP8
@@ -86,6 +96,3 @@ python manage.py loaddata fixtures.json
 3. Разворачивание проекта на удаленном сервере
 4. Отправка сообщения в Telegram об успешном выполнении workflow
 
-### Автор
-
-Студент Я.Практикум - _Юлия Орлова_

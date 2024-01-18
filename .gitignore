@@ -146,8 +146,4 @@ infra/docker-compose-local.yml
 infra/nginx_local_front.conf
 static_backend/
 
-nginx-local-start.conf
-docker-compose-local-start.yml
-docker-compose-quality.yml
-config_for_59.py
-nginx-quality.conf
+local_run
