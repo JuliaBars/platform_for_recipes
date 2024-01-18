@@ -3,7 +3,7 @@ _Репозиторий на Github [ссылка](https://github.com/JuliaBars/
 
 ## Recipes and more
 
-[![Foodgram workflow](https://github.com/JuliaBars/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)](https://github.com/JuliaBars/foodgram-project-react/actions/workflows/foodgram_workflow.yml)
+[![workflow](https://github.com/JuliaBars/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)](https://github.com/JuliaBars/foodgram-project-react/actions/workflows/foodgram_workflow.yml)
 
 Сайт продуктовый помощник с базой кулинарных рецептов. Позволяет публиковать рецепты, сохранять избранные, а также формировать список покупок для выбранных рецептов. Можно подписываться на авторов любимых рецептов.
 
@@ -40,6 +40,10 @@ docker compose -f docker-compose-local.yml up -d
 ./load_ingredients
 ```
 **После первой загрузки все данные будут храниться в volume.**
+посмотреть докуметацию к АПИ при локальном запуске можно по адресу:
+```
+http://localhost/api/docs/
+```
 
 ---
 #### Развернуть проект на удаленном сервере:
