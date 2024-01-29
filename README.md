@@ -25,7 +25,6 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=foodgram
 DB_HOST=db
 DB_PORT=5432
-DEBUG=False
 ```
 - Запустите docker compose local из директории infra/
 ```

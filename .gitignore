@@ -142,7 +142,6 @@ backend/media/recipes/9d13332ef77b99d5b51a6ad45e2f6055.jpeg
 *.code-workspace
 
 tests/
-infra/docker-compose-local.yml
 infra/nginx_local_front.conf
 static_backend/
 
